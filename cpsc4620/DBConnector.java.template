@@ -1,0 +1,54 @@
+package cpsc4620;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class DBConnector {
+    protected static String user = "YOUR_USERNAME";
+    protected static String password = "YOUR_PASSWORD";
+    private static String database_name = "PizzaDB";
+    private static String url = "jdbc:mysql://localhost:3306";
+    private static Connection conn;
+
+    /**
+     * This function will handle the connection to the database
+     *
+     * @return Connection object if successful, null otherwise
+     * @throws SQLException
+     * @throws IOException
+     */
+    public static Connection make_connection() throws SQLException, IOException {
+        try {
+            // Try loading the driver with full error reporting
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                //System.out.println("Driver loaded successfully");
+            } catch (ClassNotFoundException e) {
+                System.err.println("Could not load the driver");
+                System.err.println("Message: " + e.getMessage());
+                System.err.println("Cause: " + (e.getCause() != null ? e.getCause().getMessage() : "No cause"));
+                e.printStackTrace();
+                return null;
+            }
+
+            // Updated connection string with additional parameters
+            String fullUrl = url + "/" + database_name + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+            //System.out.println("Attempting to connect to: " + fullUrl);
+
+            // Attempt connection
+            conn = DriverManager.getConnection(fullUrl, user, password);
+            //System.out.println("Connection established successfully");
+            return conn;
+
+        } catch (SQLException e) {
+            System.err.println("SQL Exception while connecting to database:");
+            System.err.println("SQL State: " + e.getSQLState());
+            System.err.println("Error Code: " + e.getErrorCode());
+            System.err.println("Message: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
+    }
+}
